@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\MahasiswaController;
+use App\Http\Controllers\MahasiswaWebController;
 use App\Http\Controllers\MatakuliahController;
 use Illuminate\Support\Facades\Route;
 
@@ -39,3 +40,5 @@ Route::get('/cari-mahasiswa', [MahasiswaController::class, 'cari']);
 Route::get('/data-matakuliah', [MatakuliahController::class, 'index'])->name('matakuliah.index');
 
 Route::get('/data-matakuliah/{kode}', [MatakuliahController::class, 'show'])->name('matakuliah.show');
+
+Route::get('/mahasiswa-data', [MahasiswaWebController::class, 'index'])->name('mahasiswa.data');
