@@ -34,6 +34,16 @@ class UserFactory extends Factory
     }
 
     /**
+     * Pengguna dengan peran admin.
+     */
+    public function admin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'peran' => 'admin',
+        ]);
+    }
+
+    /**
      * Indicate that the model's email address should be unverified.
      */
     public function unverified(): static
