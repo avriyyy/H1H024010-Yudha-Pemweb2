@@ -208,3 +208,36 @@ func HapusMahasiswa(c fiber.Ctx) error {
 		"pesan":  "Data mahasiswa berhasil dihapus",
 	})
 }
+
+func PulihkanMahasiswa(c fiber.Ctx) error {
+	id, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "ID harus berupa angka")
+	}
+
+	mahasiswa, err := repository.AmbilPerIdUnscoped(uint(id))
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return fiber.NewError(fiber.StatusNotFound, "Mahasiswa tidak ditemukan")
+		}
+
+		return fiber.NewError(fiber.StatusInternalServerError, "Gagal mengambil data")
+	}
+
+	if !mahasiswa.DeletedAt.Valid {
+		return fiber.NewError(fiber.StatusUnprocessableEntity, "Data tidak dalam keadaan terhapus")
+	}
+
+	err = repository.Pulihkan(&mahasiswa)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "Gagal memulihkan data")
+	}
+
+	mahasiswa.DeletedAt.Valid = false
+
+	return c.JSON(fiber.Map{
+		"sukses": true,
+		"pesan":  "Data mahasiswa berhasil dipulihkan",
+		"data":   mahasiswa,
+	})
+}

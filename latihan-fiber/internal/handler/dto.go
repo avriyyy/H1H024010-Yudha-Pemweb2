@@ -9,3 +9,10 @@ type PermintaanMahasiswa struct {
 	Ipk            float64 `json:"ipk"`
 	Aktif          *bool   `json:"aktif"`
 }
+
+type PermintaanMatakuliah struct {
+	Kode     string `json:"kode"`
+	Nama     string `json:"nama"`
+	Sks      int    `json:"sks"`
+	Semester int    `json:"semester"`
+}

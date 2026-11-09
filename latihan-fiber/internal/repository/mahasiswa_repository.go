@@ -80,3 +80,17 @@ func Perbarui(mahasiswa *model.Mahasiswa) error {
 func Hapus(mahasiswa *model.Mahasiswa) error {
 	return config.DB.Delete(mahasiswa).Error
 }
+
+// AmbilPerIdUnscoped mencari data termasuk yang terhapus lunak,
+// dipakai oleh endpoint pemulihan.
+func AmbilPerIdUnscoped(id uint) (model.Mahasiswa, error) {
+	var mahasiswa model.Mahasiswa
+
+	err := config.DB.Unscoped().Preload("ProgramStudi").First(&mahasiswa, id).Error
+
+	return mahasiswa, err
+}
+
+func Pulihkan(mahasiswa *model.Mahasiswa) error {
+	return config.DB.Unscoped().Model(mahasiswa).Update("deleted_at", nil).Error
+}

@@ -1,6 +1,10 @@
 package model
 
-import "time"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type ProgramStudi struct {
 	ID        uint      `gorm:"primaryKey" json:"id"`
@@ -23,4 +27,7 @@ type Mahasiswa struct {
 	Aktif          bool          `gorm:"default:true" json:"aktif"`
 	CreatedAt      time.Time     `json:"dibuat_pada"`
 	UpdatedAt      time.Time     `json:"diubah_pada"`
+	// Soft delete: DELETE hanya mengisi kolom deleted_at. Field
+	// disembunyikan dari JSON agar bentuk respons tidak berubah.
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 }
