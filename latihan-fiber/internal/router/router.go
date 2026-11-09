@@ -19,8 +19,11 @@ func Daftarkan(app *fiber.App, konf config.Konfigurasi) {
 
 	mahasiswa := api.Group("/mahasiswa")
 	mahasiswa.Get("/", handler.DaftarMahasiswa)
+	mahasiswa.Post("/", handler.BuatMahasiswa)
 	// Rute spesifik wajib didaftarkan sebelum rute parameter /:id
 	// agar permintaan /nim/xxx tidak ditangkap sebagai id="nim".
 	mahasiswa.Get("/nim/:nim", handler.CariMahasiswaPerNim)
 	mahasiswa.Get("/:id", handler.DetailMahasiswa)
+	mahasiswa.Put("/:id", handler.PerbaruiMahasiswa)
+	mahasiswa.Delete("/:id", handler.HapusMahasiswa)
 }
