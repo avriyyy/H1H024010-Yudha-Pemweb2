@@ -26,7 +26,7 @@ func main() {
 	app.Use(recoverer.New())
 	app.Use(middleware.WaktuProses())
 
-	router.Daftarkan(app)
+	router.Daftarkan(app, konf)
 
 	app.Use(func(c fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
