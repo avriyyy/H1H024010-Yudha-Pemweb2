@@ -9,6 +9,7 @@ import (
 
 	"latihan-fiber/internal/model"
 	"latihan-fiber/internal/repository"
+	"latihan-fiber/internal/validasi"
 )
 
 func DaftarMahasiswa(c fiber.Ctx) error {
@@ -103,6 +104,15 @@ func BuatMahasiswa(c fiber.Ctx) error {
 	err := c.Bind().Body(&permintaan)
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "Format body tidak valid")
+	}
+
+	galat := validasi.Periksa(permintaan)
+	if galat != nil {
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
+			"sukses": false,
+			"pesan":  "Data yang dikirim tidak valid",
+			"galat":  galat,
+		})
 	}
 
 	aktif := true

@@ -17,23 +17,33 @@ func Daftarkan(app *fiber.App, konf config.Konfigurasi) {
 		})
 	})
 
-	mahasiswa := api.Group("/mahasiswa")
+	api.Post("/auth/registrasi", handler.Registrasi)
+	api.Post("/auth/login", handler.Login)
+
+	terlindungi := api.Group("", middleware.Autentikasi())
+
+	terlindungi.Get("/auth/profil", handler.Profil)
+
+	mahasiswa := terlindungi.Group("/mahasiswa")
 	mahasiswa.Get("/", handler.DaftarMahasiswa)
-	mahasiswa.Post("/", handler.BuatMahasiswa)
 	// Rute spesifik wajib didaftarkan sebelum rute parameter /:id
 	// agar permintaan /nim/xxx tidak ditangkap sebagai id="nim".
 	mahasiswa.Get("/nim/:nim", handler.CariMahasiswaPerNim)
 	mahasiswa.Get("/:id", handler.DetailMahasiswa)
-	mahasiswa.Put("/:id", handler.PerbaruiMahasiswa)
-	mahasiswa.Delete("/:id", handler.HapusMahasiswa)
-	mahasiswa.Post("/:id/pulihkan", handler.PulihkanMahasiswa)
+	// Middleware otorisasi dipasang SEBELUM handler karena Fiber
+	// menjalankan handler rute menurut urutan pendaftaran. Urutan
+	// sebaliknya membuat pemeriksaan peran tidak pernah berjalan.
+	mahasiswa.Post("/", middleware.HanyaPeran("admin", "dosen"), handler.BuatMahasiswa)
+	mahasiswa.Put("/:id", middleware.HanyaPeran("admin", "dosen"), handler.PerbaruiMahasiswa)
+	mahasiswa.Delete("/:id", middleware.HanyaPeran("admin"), handler.HapusMahasiswa)
+	mahasiswa.Post("/:id/pulihkan", middleware.HanyaPeran("admin"), handler.PulihkanMahasiswa)
 
-	matakuliah := api.Group("/matakuliah")
+	matakuliah := terlindungi.Group("/matakuliah")
 	matakuliah.Get("/", handler.DaftarMatakuliah)
-	matakuliah.Post("/", handler.BuatMatakuliah)
+	matakuliah.Post("/", middleware.HanyaPeran("admin", "dosen"), handler.BuatMatakuliah)
 	matakuliah.Get("/:id", handler.DetailMatakuliah)
-	matakuliah.Put("/:id", handler.PerbaruiMatakuliah)
-	matakuliah.Delete("/:id", handler.HapusMatakuliah)
+	matakuliah.Put("/:id", middleware.HanyaPeran("admin", "dosen"), handler.PerbaruiMatakuliah)
+	matakuliah.Delete("/:id", middleware.HanyaPeran("admin"), handler.HapusMatakuliah)
 
-	api.Get("/program-studi", handler.DaftarProgramStudi)
+	terlindungi.Get("/program-studi", handler.DaftarProgramStudi)
 }
