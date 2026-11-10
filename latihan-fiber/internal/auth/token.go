@@ -32,6 +32,10 @@ func TerbitkanToken(idPengguna uint, peran string, rahasia string, ttlMenit int)
 }
 
 func PeriksaToken(nilaiToken string, rahasia string) (*Klaim, error) {
+	if Dicabut(nilaiToken) {
+		return nil, errors.New("token sudah dicabut")
+	}
+
 	token, err := jwt.ParseWithClaims(nilaiToken, &Klaim{}, func(t *jwt.Token) (any, error) {
 		if _, cocok := t.Method.(*jwt.SigningMethodHMAC); cocok == false {
 			return nil, errors.New("metode penandatanganan tidak didukung")

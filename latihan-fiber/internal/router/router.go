@@ -23,6 +23,8 @@ func Daftarkan(app *fiber.App, konf config.Konfigurasi) {
 	terlindungi := api.Group("", middleware.Autentikasi())
 
 	terlindungi.Get("/auth/profil", handler.Profil)
+	terlindungi.Post("/auth/segarkan", handler.Segarkan)
+	terlindungi.Post("/auth/logout", handler.Logout)
 
 	mahasiswa := terlindungi.Group("/mahasiswa")
 	mahasiswa.Get("/", handler.DaftarMahasiswa)

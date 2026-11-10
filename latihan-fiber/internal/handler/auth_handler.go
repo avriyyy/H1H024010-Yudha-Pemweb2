@@ -113,3 +113,50 @@ func Profil(c fiber.Ctx) error {
 		"data":   pengguna,
 	})
 }
+
+func Segarkan(c fiber.Ctx) error {
+	idPengguna, cocok := c.Locals("id_pengguna").(uint)
+	if cocok == false {
+		return fiber.NewError(fiber.StatusUnauthorized, "Identitas pengguna tidak ditemukan")
+	}
+
+	peran, cocok := c.Locals("peran").(string)
+	if cocok == false {
+		return fiber.NewError(fiber.StatusUnauthorized, "Peran pengguna tidak ditemukan")
+	}
+
+	konf := config.Muat()
+
+	token, err := auth.TerbitkanToken(idPengguna, peran, konf.JwtSecret, konf.JwtTtlMenit)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "Gagal menerbitkan token")
+	}
+
+	return c.JSON(fiber.Map{
+		"sukses": true,
+		"pesan":  "Token berhasil disegarkan",
+		"data": fiber.Map{
+			"token": token,
+			"tipe":  "Bearer",
+		},
+	})
+}
+
+func Logout(c fiber.Ctx) error {
+	nilaiToken, cocok := c.Locals("token").(string)
+	if cocok == false || nilaiToken == "" {
+		return fiber.NewError(fiber.StatusUnauthorized, "Token tidak ditemukan")
+	}
+
+	kedaluwarsa, cocok := c.Locals("kedaluwarsa").(int64)
+	if cocok == false {
+		return fiber.NewError(fiber.StatusUnauthorized, "Isi token tidak sesuai")
+	}
+
+	auth.Cabut(nilaiToken, kedaluwarsa)
+
+	return c.JSON(fiber.Map{
+		"sukses": true,
+		"pesan":  "Logout berhasil",
+	})
+}

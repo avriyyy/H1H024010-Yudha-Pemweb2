@@ -38,6 +38,8 @@ func Autentikasi() fiber.Handler {
 
 		c.Locals("id_pengguna", uint(id))
 		c.Locals("peran", klaim.Peran)
+		c.Locals("token", bagian[1])
+		c.Locals("kedaluwarsa", klaim.ExpiresAt.Unix())
 
 		return c.Next()
 	}
